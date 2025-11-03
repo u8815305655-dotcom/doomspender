@@ -1,7 +1,6 @@
-// Data Layer – az adatkezelés absztrakciója
-
+// Backend-ready Data Layer
 export const DataLayer = {
-  // PROFIL
+  // Profilkezelés
   async getProfile() {
     const raw = localStorage.getItem("profile");
     return raw ? JSON.parse(raw) : null;
@@ -11,11 +10,7 @@ export const DataLayer = {
     localStorage.setItem("profile", JSON.stringify(profile));
   },
 
-  async deleteProfile() {
-    localStorage.removeItem("profile");
-  },
-
-  // TERMÉKEK
+  // Termékek
   async getItems() {
     const raw = localStorage.getItem("items");
     return raw ? JSON.parse(raw) : [];
@@ -33,16 +28,13 @@ export const DataLayer = {
     localStorage.setItem("items", JSON.stringify(filtered));
   },
 
-  // MOCK backend hívások (előre készítve)
+  // Mock API-hívások (későbbi bővítéshez)
   async apiGet(endpoint) {
-    // 🔥 később ide jön a fetch(`https://api.sajatbackend.hu/${endpoint}`)
-    console.log("[MOCK API GET]", endpoint);
+    console.log(`[MOCK GET] /${endpoint}`);
     return [];
   },
-
   async apiPost(endpoint, data) {
-    console.log("[MOCK API POST]", endpoint, data);
+    console.log(`[MOCK POST] /${endpoint}`, data);
     return { success: true };
   }
 };
-
