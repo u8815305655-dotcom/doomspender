@@ -1,6 +1,7 @@
 import { reactionMessages } from "../data/messages.js";
 import { DataLayer } from "./dataLayer.js";
 
+
 const $ = s => document.querySelector(s);
 const fmtFt = v => new Intl.NumberFormat("hu-HU",{style:"currency",currency:"HUF",maximumFractionDigits:0}).format(Number(v||0));
 
