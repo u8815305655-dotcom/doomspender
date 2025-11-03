@@ -1,4 +1,6 @@
 import { reactionMessages } from "../data/messages.js";
+import { DataLayer } from "./dataLayer.js";
+
 
 const state = {
   name: "",
