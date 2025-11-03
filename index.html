@@ -1,182 +1,527 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Munkaóra</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{
+      --accent:#00b3a4;        /* türkiz */
+      --accent2:#7c3aed;       /* lila highlight */
+      --good:#16a34a;          /* zöld */
+      --bad:#dc2626;           /* piros */
+      --glass: rgba(255,255,255,.6);
+    }
+    html,body{height:100%}
+    body{
+      background:
+        radial-gradient(1300px 700px at -10% -10%, #e0f7f5 0%, transparent 60%),
+        radial-gradient(1200px 700px at 110% 10%, #efe7ff 0%, transparent 55%),
+        linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:#0f172a;
+    }
+    .glass{
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(15,23,42,.08);
+      border:1px solid rgba(255,255,255,.5);
+    }
+    .card{
+      border-radius: 18px;
+      padding: 18px;
+      background: white;
+      box-shadow: 0 16px 40px rgba(2,6,23,.08);
+      border:1px solid rgba(2,6,23,.06);
+    }
+    .btn{
+      border-radius: 9999px;
+      padding: 12px 16px;
+      font-weight: 700;
+      transition: transform .06s ease, box-shadow .2s ease, filter .2s ease;
+      box-shadow: 0 8px 18px rgba(2,6,23,.06);
+    }
+    .btn:active{ transform: translateY(1px) scale(.99) }
+    .btn-accent{ background: linear-gradient(135deg, var(--accent), #04c7b6); color:#fff; }
+    .btn-accent:hover{ filter: brightness(1.05); }
+    .btn-secondary{ background:#eef2ff; color:#3730a3; }
+    .btn-yellow{ background: linear-gradient(135deg, #ffd166, #ffec99); color:#111827; }
+    .btn-good{ background: linear-gradient(135deg, var(--good), #34d399); color:#fff; }
+    .btn-bad{ background: linear-gradient(135deg, var(--bad), #ef4444); color:#fff; }
+    .input{
+      width: 100%;
+      background:#f3f4f6;
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      border:1px solid transparent;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .input:focus{ border-color:#93c5fd; background:#ffffff }
+    .title{
+      font-size: 26px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -.01em;
+    }
+    .sub{ color:#475569 }
+    .chip{
+      padding:6px 10px; border-radius:9999px; background:#f1f5f9; font-size:12px; color:#334155
+    }
+    .floating{
+      animation: floaty 6s ease-in-out infinite;
+    }
+    @keyframes floaty{
+      0%{ transform: translateY(0) }
+      50%{ transform: translateY(-6px) }
+      100%{ transform: translateY(0) }
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 flex items-center justify-center min-h-screen">
+<body class="min-h-screen flex items-center justify-center p-4">
 
-  <div class="w-full max-w-sm bg-white rounded-2xl shadow-lg p-6 space-y-4">
-    <h1 class="text-2xl font-bold text-center">Munkaóra</h1>
+  <!-- Wrap -->
+  <main class="w-full max-w-sm space-y-4">
 
-    <!-- Profil -->
-    <div id="profile-section" class="space-y-3">
-      <p class="text-center text-gray-600">Add meg a profilod</p>
-      <input id="salary" type="number" placeholder="Nettó havi fizetés (Ft)" class="w-full border rounded-lg p-2">
-      <input id="hours" type="number" placeholder="Heti munkaórák száma" class="w-full border rounded-lg p-2">
-      <button id="saveProfile" class="bg-blue-600 text-white w-full py-2 rounded-lg">Mentés</button>
-    </div>
-
-    <div id="main-section" class="hidden space-y-3">
-      <div class="flex justify-between items-center">
-        <h2 class="font-semibold text-lg">Új termék</h2>
-        <button id="editProfile" class="text-blue-500 text-sm underline">Profil szerkesztése</button>
+    <!-- Top bar -->
+    <div class="glass rounded-2xl p-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl"
+             style="background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); box-shadow:0 6px 16px rgba(124,58,237,.25)"></div>
+        <strong>Munkaóra</strong>
       </div>
-      <input id="productName" type="text" placeholder="Termék neve" class="w-full border rounded-lg p-2">
-      <input id="productPrice" type="number" placeholder="Termék ára (Ft)" class="w-full border rounded-lg p-2">
-      <button id="calculateBtn" class="bg-yellow-400 font-semibold w-full py-2 rounded-lg">Kiszámolom</button>
-
-      <div id="decision-buttons" class="hidden space-x-2 flex">
-        <button id="saveBtn" class="bg-green-500 text-white w-1/2 py-2 rounded-lg font-semibold">💚 Megspórolom</button>
-        <button id="buyBtn" class="bg-red-500 text-white w-1/2 py-2 rounded-lg font-semibold">❤️ Megveszem</button>
-      </div>
-
-      <p id="workResult" class="text-center text-gray-700 text-sm hidden"></p>
-
-      <div class="mt-4">
-        <h3 class="font-semibold">Eredmények</h3>
-        <ul id="resultList" class="divide-y"></ul>
+      <div class="flex items-center gap-2">
+        <button id="goCalc" class="chip">Számoló</button>
+        <button id="goResults" class="chip">Lista</button>
+        <button id="goProfile" class="chip">Profil</button>
       </div>
     </div>
-  </div>
 
-  <!-- Modal -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded-xl shadow-lg text-center w-80">
-      <p id="modalText" class="text-lg font-medium mb-4"></p>
-      <button id="closeModal" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Oké 😅</button>
+    <!-- WELCOME -->
+    <section id="screen-welcome" class="card">
+      <div class="flex flex-col items-center text-center gap-3">
+        <h1 class="title">Kontextus a költéseid fölé 💸</h1>
+        <p class="sub">Számold ki, hány munkaórádba kerülne egy termék – és dönts tudatosabban.</p>
+        <div class="w-full h-28 rounded-2xl floating"
+             style="background:
+                radial-gradient(200px 120px at 25% 30%, rgba(0,179,164,.25), transparent 60%),
+                radial-gradient(220px 140px at 75% 20%, rgba(124,58,237,.18), transparent 55%),
+                linear-gradient(180deg, #fff, #f8fafc);"></div>
+        <button id="startBtn" class="btn btn-accent w-full">Kezdjük</button>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="screen-profile" class="card hidden">
+      <h2 class="title mb-2">Profil beállítás</h2>
+      <p class="sub mb-3 text-sm">Nettó bér és heti munkaórák alapján számolunk. Később bármikor módosíthatod.</p>
+
+      <label class="block text-sm font-semibold mb-1">Nettó havi fizetés (Ft)</label>
+      <input id="salary" type="number" inputmode="numeric" class="input mb-3" placeholder="pl. 420000">
+
+      <label class="block text-sm font-semibold mb-1">Heti munkaórák</label>
+      <input id="hours" type="number" inputmode="numeric" class="input mb-4" placeholder="pl. 40">
+
+      <div class="flex gap-2">
+        <button id="saveProfile" class="btn btn-accent flex-1">Mentés</button>
+        <button id="cancelProfile" class="btn btn-secondary flex-1">Mégse</button>
+      </div>
+    </section>
+
+    <!-- CALCULATOR -->
+    <section id="screen-calc" class="card hidden">
+      <h2 class="title mb-2">Új számítás</h2>
+      <p class="sub text-sm mb-3">Add meg a terméket és az árát.</p>
+
+      <label class="block text-sm font-semibold mb-1">Termék neve</label>
+      <input id="productName" type="text" class="input mb-3" placeholder="pl. iPhone 15">
+
+      <label class="block text-sm font-semibold mb-1">Termék ára (Ft)</label>
+      <input id="productPrice" type="number" inputmode="numeric" class="input mb-4" placeholder="pl. 299000">
+
+      <button id="calculateBtn" class="btn btn-yellow w-full mb-4">Kiszámolom</button>
+
+      <div id="calcBox" class="hidden rounded-2xl p-4"
+        style="background:linear-gradient(145deg, rgba(255,255,255,.9), rgba(250,250,255,.9)); border:1px solid #eef2ff">
+        <p id="workResult" class="font-semibold text-center"></p>
+        <p id="workSub" class="text-center text-sm text-slate-500 mt-1"></p>
+
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <button id="saveBtn" class="btn btn-good">💚 Megspórolom</button>
+          <button id="buyBtn" class="btn btn-bad">❤️ Megveszem</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="screen-results" class="card hidden">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="title">Eredmények</h2>
+        <button id="clearList" class="chip">Lista törlése</button>
+      </div>
+
+      <ul id="resultList" class="divide-y divide-slate-100"></ul>
+
+      <!-- Quick add row -->
+      <div class="mt-4 p-3 rounded-xl" style="background:#f8fafc; border:1px dashed #e2e8f0">
+        <p class="text-sm font-semibold mb-2">Gyors hozzáadás</p>
+        <div class="grid grid-cols-2 gap-2">
+          <input id="quickName" type="text" class="input" placeholder="Termék">
+          <input id="quickPrice" type="number" class="input" placeholder="Ár (Ft)">
+        </div>
+        <div class="flex gap-2 mt-2">
+          <button id="quickAddSave" class="btn btn-good flex-1">+ Spóroltam</button>
+          <button id="quickAddBuy"  class="btn btn-bad flex-1">+ Vettem</button>
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-3">
+        <button id="backToCalc" class="btn btn-secondary">Vissza a számolóhoz</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50">
+    <div class="min-h-full flex items-center justify-center p-4">
+      <div class="w-full max-w-sm card">
+        <h3 class="text-lg font-bold mb-2">Ejnye…</h3>
+        <p id="modalText" class="mb-4"></p>
+        <div class="text-right">
+          <button id="closeModal" class="btn btn-accent">Oké 😅</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    const salaryInput = document.getElementById('salary');
-    const hoursInput = document.getElementById('hours');
-    const profileSection = document.getElementById('profile-section');
-    const mainSection = document.getElementById('main-section');
-    const saveProfile = document.getElementById('saveProfile');
-    const editProfile = document.getElementById('editProfile');
-    const calculateBtn = document.getElementById('calculateBtn');
-    const productName = document.getElementById('productName');
-    const productPrice = document.getElementById('productPrice');
-    const decisionButtons = document.getElementById('decision-buttons');
-    const saveBtn = document.getElementById('saveBtn');
-    const buyBtn = document.getElementById('buyBtn');
-    const resultList = document.getElementById('resultList');
-    const workResult = document.getElementById('workResult');
-    const modal = document.getElementById('modal');
-    const modalText = document.getElementById('modalText');
-    const closeModal = document.getElementById('closeModal');
+    // ---------- Helpers ----------
+    const qs = (s)=>document.querySelector(s);
+    const fmtFt = (v)=> new Intl.NumberFormat('hu-HU',{ style:'currency', currency:'HUF', maximumFractionDigits:0}).format(Number(v||0));
+    const showOnly = (id)=> {
+      ['welcome','profile','calc','results'].forEach(x=>qs('#screen-'+x).classList.add('hidden'));
+      qs('#screen-'+id).classList.remove('hidden');
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
 
+    // ---------- Storage ----------
+    const getProfile = ()=> JSON.parse(localStorage.getItem('profile')||'null');
+    const setProfile = (obj)=> localStorage.setItem('profile', JSON.stringify(obj));
+    const getItems = ()=> JSON.parse(localStorage.getItem('results')||'[]');
+    const setItems = (arr)=> localStorage.setItem('results', JSON.stringify(arr));
+
+    // ---------- App state ----------
+    let latestCalc = null; // { name, price, hours, hourly }
+
+    // ---------- UI elérések ----------
+    const el = {
+      // nav
+      goCalc: qs('#goCalc'),
+      goResults: qs('#goResults'),
+      goProfile: qs('#goProfile'),
+      // welcome
+      startBtn: qs('#startBtn'),
+      // profile
+      salary: qs('#salary'),
+      hours: qs('#hours'),
+      saveProfile: qs('#saveProfile'),
+      cancelProfile: qs('#cancelProfile'),
+      // calc
+      productName: qs('#productName'),
+      productPrice: qs('#productPrice'),
+      calculateBtn: qs('#calculateBtn'),
+      calcBox: qs('#calcBox'),
+      workResult: qs('#workResult'),
+      workSub: qs('#workSub'),
+      saveBtn: qs('#saveBtn'),
+      buyBtn: qs('#buyBtn'),
+      // results
+      resultList: qs('#resultList'),
+      clearList: qs('#clearList'),
+      quickName: qs('#quickName'),
+      quickPrice: qs('#quickPrice'),
+      quickAddSave: qs('#quickAddSave'),
+      quickAddBuy: qs('#quickAddBuy'),
+      backToCalc: qs('#backToCalc'),
+      // modal
+      modal: qs('#modal'),
+      modalText: qs('#modalText'),
+      closeModal: qs('#closeModal'),
+    };
+
+    // ---------- Üzenetek (100+) ----------
     const messages = [
-      "Ejha, ennyit melózni ezért? 😅","Remélem, tényleg megérte!","A lelkiismereted most elment kávézni.",
-      "Ez fájni fog hó végén.","Na, legalább szép volt.","Kéne hozzá egy fizetésemelés is...","Hmm, bátor döntés.",
-      "Egy nap szabadság ára!","Remélem, élvezed minden forintját!","Kéne egy második állás is, mi?","Ouch. 😬",
-      "A bankszámlád épp felsóhajtott.","Ez a döntés nem volt olcsó.","A jövőbeli éned nem biztos, hogy tapsol.","Le a kalappal.",
-      "Ez a munkaóra kalkulátor sír.","A zsebed épp fogyókúrázik.","Szívből gratulálok a bátorságodhoz.","Ezt nem mindenki vállalná be!",
-      "A pénztárcád most offline módba váltott."
+      "Ejha, ennyit melózni ezért? 😅",
+      "Remélem, tényleg megérte!",
+      "A lelkiismereted most elment kávézni.",
+      "Ez fájni fog hó végén.",
+      "Legalább szép lesz.",
+      "Kéne hozzá egy fizetésemelés is…",
+      "Bátor döntés, kapitány!",
+      "Egy szabadnap ára simán elment.",
+      "Élvezd minden forintját!",
+      "Második állás is játszik? 🙃",
+      "Au. A pénztárcád megsértődött.",
+      "A bankszámlád mély levegőt vett.",
+      "A jövőbeli éned most csóválja a fejét.",
+      "A kalkulátor sírva kér bocsánatot.",
+      "A zsebed most diétázik.",
+      "Szívd fel, ez már committed. 💸",
+      "Nem minden hős visel köpenyt. Némelyik hitelkártyát.",
+      "A racionalitás most elment ebédelni.",
+      "A megtakarításod most offline.",
+      "Legalább lesz mit posztolni.",
+      "Kérj számlát, fájni fog emlék nélkül.",
+      "Ha örömöt hoz, megérte. Ha porosodik, kevésbé.",
+      "A munkaidőd tapssal kísérte a döntést.",
+      "Ez is egy életút.",
+      "Az infláció tapsol a partvonalról.",
+      "A minimalizmus most felmondott.",
+      "A későbbi én: „ugye használtad is?”",
+      "A pénzügyi tanácsadód ghostol.",
+      "Ez a vásárlás kávéban mérve sok.",
+      "A főnököd most büszke lenne… vagy nem.",
+      "Az érték: kétes. Az érzés: drága.",
+      "A vágy győzött a józan ész felett.",
+      "Kinek kell nyaralás, ha van ez is?",
+      "A kassza: *critical hit*.",
+      "A spórolás: AFK.",
+      "A felelősség: „most nem érek rá”.",
+      "Beáldoztál pár Netflix-estét munkára.",
+      "Egészségedre… a költésedre.",
+      "Kockázatos? Igen. Menő? Talán.",
+      "Ez az élmény árban prémium.",
+      "Kipipáltad a drága döntés bingo-t.",
+      "A FOMO hangosan tapsolt.",
+      "Egyszer élünk – a bankszámla szerint kétszer fizetünk.",
+      "Ha használod, megérte. Ha nem, trófea lett.",
+      "Ez már nem impulzus, ez románc.",
+      "A hiteled: nem pénzügyi értelemben nőtt.",
+      "Mennyi órát ér meg a mosoly?",
+      "A kalkulátor: „mondd, hogy legalább akciós volt!”",
+      "A munkabér: „én ezért dolgoztam?”",
+      "A céljaid most újraszámolnak.",
+      "Naptár: új bejegyzés – „többet dolgozni”.",
+      "A döntésed 10+ órás film hosszú.",
+      "Kávét főzz, ez hosszú menet lesz.",
+      "A spórolópersely sírva néz.",
+      "A tudatosság most vakációzik.",
+      "Ez a „most vagy soha” elég drága volt.",
+      "Kaptál érte örömöt? Remek. Számlát? Még jobb.",
+      "Szép, csillog, drága – mint a döntésed.",
+      "A pénztárcád kifeküdt a kanapéra.",
+      "A jéghideg zuhany a hó végén jön.",
+      "Extra órák incoming.",
+      "Szeresd. Mert sok munkaóra szeretne viszontlátni.",
+      "A jövőbeli te: „na jó, legyen, csak használd”",
+      "Minimum 10 óra – maximum remény.",
+      "A boldogság ára: pontosan ennyi.",
+      "Ez a „megérdemlem” deluxe csomagja.",
+      "A racionalitás üzenete: “visszahívjuk.”",
+      "Ha értéket hoz, szent. Ha porosodik, bűn.",
+      "A költségvetés most nyújtózik.",
+      "A minimalista szíved most kihagyott egy ütemet.",
+      "Számolj: mosoly/óra arány.",
+      "Tudatos költés? Most inkább tudatos utólagosság.",
+      "Jár a pacsi – és a túlóra.",
+      "Ha örömet hoz, ne bánkódj. Ha státuszt, gondold át.",
+      "Ez a „treat yourself” XL verzió.",
+      "A pénz idő – most sok idő ment pénzbe.",
+      "A költésed most influencer lenne.",
+      "Ajándék magadnak – a számla is az.",
+      "Drága lecke vagy értékes befektetés?",
+      "A spórolási célod kicsit odébb költözött.",
+      "A realitás csendben integet.",
+      "Az órabéred megszomorodott.",
+      "Az élmény ára: kimondva fáj, használatban gyógyít.",
+      "A „majd holnap spórolok” ma valutát váltott.",
+      "Egy kis bűntudat jár mellé, ingyen.",
+      "Ha a szívedet szolgálja, oké. Ha az egód, drága.",
+      "A bank appod push értesítést írt: „ejnye”.",
+      "Ha legalább akciós volt, kevésbé fáj.",
+      "A döntés megtörtént, a pénz elment, az érték maradjon.",
+      "Légy kedves a jövőbeli énedhez – használd!",
+      "A spórolt célok most átmenetileg szünetelnek.",
+      "Ez a luxus a mindennapok tetején ül.",
+      "A pénzügyi tudatosság most csendre váltott.",
+      "A „csak egyszer élünk” addig jó, amíg kétszer nem fizetsz.",
+      "A kassza: „köszi az adományt”.",
+      "Az öröm-indexed remélhetőleg emelkedik.",
+      "A döntésed valószínűleg gyönyörű – és költséges.",
+      "A kalkulátor beírta: „huh”.",
+      "Az excel táblád most fintorog.",
+      "A munkaóra-számláló megszaladt.",
+      "A lelkiismeret: „beszéljünk holnap”.",
+      "A céljaid: „egy kicsit később”.",
+      "A pénztárca: „ma pihenek”.",
+      "Ez a döntés piros betűvel került a naptárba.",
+      "Ha értéket termel, minden oké.",
+      "A hezitálás drága – a döntés még drágább.",
+      "A spórolási csík most visszafelé kúszott.",
+      "A te időd arany – most tényleg azzá vált.",
+      "A FOMO most nyert, a pénztárca veszített.",
+      "Ez egy „több munka, ugyanannyi öröm?”-típusú döntés.",
+      "Ha mosolyogsz tőle, rendben vagyunk.",
+      "A józan ész most csendben figyel.",
+      "A céltábla átállt: „élmény” mód.",
+      "A pénzügyi coachod most mély levegőt vett.",
+      "A munkaóra-kalkulátor tapsol… idegesen.",
+      "Ha kihasználod, oké. Ha dobozban marad, ejnye.",
+      "A döntésed történetet mesél – csak drágát."
     ];
+    // 100 fölött vagyunk (110+)
 
-    function saveProfileData() {
-      const salary = parseFloat(salaryInput.value);
-      const hours = parseFloat(hoursInput.value);
-      if (salary && hours) {
-        localStorage.setItem('profile', JSON.stringify({ salary, hours }));
-        profileSection.classList.add('hidden');
-        mainSection.classList.remove('hidden');
+    // ---------- Működés ----------
+    function init(){
+      // Nav
+      el.goCalc.addEventListener('click', ()=> showOnly('calc'));
+      el.goResults.addEventListener('click', ()=> { renderList(); showOnly('results'); });
+      el.goProfile.addEventListener('click', ()=> {
+        const p = getProfile();
+        if(p){ el.salary.value = p.salary; el.hours.value = p.hours; }
+        showOnly('profile');
+      });
+
+      // Welcome
+      el.startBtn.addEventListener('click', ()=>{
+        const p = getProfile();
+        if(!p){ showOnly('profile'); } else { showOnly('calc'); }
+      });
+
+      // Profile
+      el.saveProfile.addEventListener('click', ()=>{
+        const s = Number(el.salary.value);
+        const h = Number(el.hours.value);
+        if(!s || !h || s < 0 || h <= 0){ alert('Kérlek, érvényes értékeket adj meg.'); return; }
+        setProfile({ salary:s, hours:h });
+        showOnly('calc');
+      });
+      el.cancelProfile.addEventListener('click', ()=>{
+        const p = getProfile();
+        if(p){ showOnly('calc'); } else { showOnly('welcome'); }
+      });
+
+      // Calculator
+      el.calculateBtn.addEventListener('click', doCalculate);
+      el.saveBtn.addEventListener('click', ()=> decide('save'));
+      el.buyBtn.addEventListener('click',  ()=> decide('buy'));
+
+      // Results
+      el.clearList.addEventListener('click', ()=>{
+        if(confirm('Biztos törlöd az összes elemet?')){ setItems([]); renderList(); }
+      });
+      el.backToCalc.addEventListener('click', ()=> showOnly('calc'));
+      el.quickAddSave.addEventListener('click', ()=> quickAdd('save'));
+      el.quickAddBuy.addEventListener('click',  ()=> quickAdd('buy'));
+
+      // Modal
+      el.closeModal.addEventListener('click', ()=> el.modal.classList.add('hidden'));
+
+      // Start screen
+      const p = getProfile();
+      if(p){ showOnly('calc'); } else { showOnly('welcome'); }
+      renderList();
+    }
+
+    function doCalculate(){
+      const name = (el.productName.value || '').trim();
+      const price = Number(el.productPrice.value);
+      const p = getProfile();
+      if(!p){ alert('Előbb add meg a profilod!'); showOnly('profile'); return; }
+      if(!name || !price){ alert('Add meg a termék nevét és árát.'); return; }
+
+      const hourly = p.salary / (p.hours * 4); // egyszerű közelítés
+      const hours = price / hourly;
+      latestCalc = { name, price, hours, hourly };
+
+      el.workResult.textContent = `Ez kb. ${hours.toFixed(1)} munkaórádba kerülne.`;
+      el.workSub.textContent = `${name} ára: ${fmtFt(price)} • Órabéred ~ ${fmtFt(hourly)}`;
+      el.calcBox.classList.remove('hidden');
+    }
+
+    function decide(type){
+      if(!latestCalc){ return; }
+      const items = getItems();
+      items.unshift({
+        id: Date.now(),
+        name: latestCalc.name,
+        price: latestCalc.price,
+        type
+      });
+      setItems(items);
+      renderList();
+      showOnly('results');
+
+      // Modal, ha > 10 óra és „Megveszem”
+      if(type === 'buy' && latestCalc.hours > 10){
+        const msg = messages[Math.floor(Math.random()*messages.length)];
+        el.modalText.textContent = msg;
+        el.modal.classList.remove('hidden');
       }
+
+      // reset calculator inputs + box
+      el.productName.value = '';
+      el.productPrice.value = '';
+      el.calcBox.classList.add('hidden');
+      latestCalc = null;
     }
 
-    function loadProfile() {
-      const profile = JSON.parse(localStorage.getItem('profile'));
-      if (profile) {
-        salaryInput.value = profile.salary;
-        hoursInput.value = profile.hours;
-        profileSection.classList.add('hidden');
-        mainSection.classList.remove('hidden');
+    function quickAdd(type){
+      const name = (el.quickName.value||'').trim();
+      const price = Number(el.quickPrice.value);
+      if(!name || !price){ alert('Adj meg nevet és árat.'); return; }
+      const items = getItems();
+      items.unshift({ id: Date.now(), name, price, type });
+      setItems(items);
+      el.quickName.value = '';
+      el.quickPrice.value = '';
+      renderList();
+    }
+
+    function removeItem(id){
+      const items = getItems().filter(x=>x.id !== id);
+      setItems(items);
+      renderList();
+    }
+
+    function renderList(){
+      const list = getItems();
+      el.resultList.innerHTML = '';
+      if(list.length === 0){
+        el.resultList.innerHTML = `
+          <li class="py-6 text-center text-slate-500">
+            Még nincs tétel. Vedd fel a számolóval, vagy használd a gyors hozzáadást.
+          </li>`;
+        return;
       }
-    }
-
-    function calcWorkHours(price) {
-      const profile = JSON.parse(localStorage.getItem('profile'));
-      const hourly = profile.salary / (profile.hours * 4);
-      return (price / hourly).toFixed(1);
-    }
-
-    function updateList() {
-      const items = JSON.parse(localStorage.getItem('results')) || [];
-      resultList.innerHTML = '';
-      items.forEach((item, i) => {
-        const li = document.createElement('li');
-        li.className = `flex justify-between items-center py-2 ${item.type === 'buy' ? 'text-red-500' : 'text-green-600'}`;
-        li.innerHTML = `<span>${item.name} – ${item.price.toLocaleString()} Ft</span> 
-                        <button class="text-gray-400 hover:text-black" onclick="removeItem(${i})">❌</button>`;
-        resultList.appendChild(li);
+      for(const it of list){
+        const row = document.createElement('li');
+        const color = it.type === 'buy' ? 'text-red-600' : 'text-green-600';
+        const badge = it.type === 'buy' ? 'VETTEM' : 'SPÓROLTAM';
+        row.className = 'py-3 flex items-center justify-between';
+        row.innerHTML = `
+          <div class="flex flex-col">
+            <span class="font-semibold ${color}">${escapeHtml(it.name)}</span>
+            <span class="text-sm text-slate-500">${badge}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="tabular-nums font-semibold">${fmtFt(it.price)}</span>
+            <button aria-label="Törlés" class="chip hover:bg-red-50 hover:text-red-600" data-del="${it.id}">❌</button>
+          </div>`;
+        el.resultList.appendChild(row);
+      }
+      // törlés handler
+      el.resultList.querySelectorAll('[data-del]').forEach(btn=>{
+        btn.addEventListener('click', ()=> removeItem(Number(btn.getAttribute('data-del'))));
       });
     }
 
-    function removeItem(index) {
-      const items = JSON.parse(localStorage.getItem('results')) || [];
-      items.splice(index, 1);
-      localStorage.setItem('results', JSON.stringify(items));
-      updateList();
-    }
+    function escapeHtml(str){ return str.replace(/[&<>'"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
 
-    saveProfile.addEventListener('click', saveProfileData);
-    editProfile.addEventListener('click', () => {
-      profileSection.classList.remove('hidden');
-      mainSection.classList.add('hidden');
-    });
-
-    calculateBtn.addEventListener('click', () => {
-      const price = parseFloat(productPrice.value);
-      const name = productName.value.trim();
-      if (!price || !name) return;
-      const hours = calcWorkHours(price);
-      workResult.textContent = `Ez kb. ${hours} munkaórádba kerülne.`;
-      workResult.classList.remove('hidden');
-      decisionButtons.classList.remove('hidden');
-    });
-
-    saveBtn.addEventListener('click', () => {
-      const name = productName.value;
-      const price = parseFloat(productPrice.value);
-      const results = JSON.parse(localStorage.getItem('results')) || [];
-      results.push({ name, price, type: 'save' });
-      localStorage.setItem('results', JSON.stringify(results));
-      updateList();
-      decisionButtons.classList.add('hidden');
-      productName.value = '';
-      productPrice.value = '';
-      workResult.textContent = '';
-    });
-
-    buyBtn.addEventListener('click', () => {
-      const name = productName.value;
-      const price = parseFloat(productPrice.value);
-      const hours = parseFloat(calcWorkHours(price));
-      const results = JSON.parse(localStorage.getItem('results')) || [];
-      results.push({ name, price, type: 'buy' });
-      localStorage.setItem('results', JSON.stringify(results));
-      updateList();
-      decisionButtons.classList.add('hidden');
-      productName.value = '';
-      productPrice.value = '';
-      workResult.textContent = '';
-
-      if (hours > 10) {
-        modalText.textContent = messages[Math.floor(Math.random() * messages.length)];
-        modal.classList.remove('hidden');
-      }
-    });
-
-    closeModal.addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-
-    loadProfile();
-    updateList();
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>
+
