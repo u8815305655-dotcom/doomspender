@@ -1,159 +1,69 @@
-:root {
-  --blue: #1a73e8;
-  --green: #22c55e;
-  --red: #ef4444;
-  --yellow: #facc15;
-  --bg: linear-gradient(180deg, #f6f8ff 0%, #ffffff 100%);
-  --card: #fff;
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
-  --radius: 18px;
-  --font: 'Inter', system-ui, sans-serif;
-}
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Munkaóra</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <header class="hero">
+    <h1>Munkaóra</h1>
+    <p class="subtitle">Tudd, hány órát dolgozol a vágyaidért. <span class="coach-tag">+ Apádhelyett Anyád 🫨</span></p>
+  </header>
 
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  color: #111;
-}
+  <main>
+    <!-- PROFIL -->
+    <section id="profile-section" class="card">
+      <h2>Profilod</h2>
+      <div class="form-group"><label>Becenév</label><input id="name" type="text" placeholder="Add meg a beceneved"></div>
+      <div class="form-group"><label>Kor</label><input id="age" type="number" placeholder="Add meg a korod"></div>
+      <div class="form-group"><label>Nettó havi fizetés (Ft)</label><input id="salary" type="number" placeholder="Pl. 450000"></div>
+      <div class="form-group"><label>Heti munkaórák</label><input id="hours" type="number" placeholder="Pl. 40"></div>
+      <div class="row">
+        <button id="saveProfile" class="btn blue">Mentés</button>
+        <button id="resetProfile" class="btn ghost">Profil törlése</button>
+      </div>
+    </section>
 
-.hero {
-  text-align: center;
-  margin-top: 20px;
-  animation: fadeIn 0.6s ease;
-}
+    <!-- KALKULÁTOR -->
+    <section id="calculator-section" class="card hidden">
+      <h2>Kalkulátor</h2>
+      <div class="form-group"><label>Termék neve</label><input id="itemName" type="text" placeholder="Mit szeretnél venni?"></div>
+      <div class="form-group"><label>Termék ára (Ft)</label><input id="itemPrice" type="number" placeholder="Pl. 19990"></div>
+      <button id="calcButton" class="btn yellow">Kiszámolom</button>
 
-h1 {
-  font-size: 32px;
-  margin-bottom: 6px;
-}
+      <div id="calcResultWrap" class="hidden">
+        <p id="calcResult" class="result-text"></p>
+        <div id="decisionButtons" class="row">
+          <button id="saveButton" class="btn green">Megspórolom 💚</button>
+          <button id="buyButton" class="btn red">Megveszem 💸</button>
+        </div>
+      </div>
+    </section>
 
-.subtitle {
-  font-size: 15px;
-  color: #6b7280;
-}
+    <!-- EREDMÉNYEK -->
+    <section id="results-section" class="card hidden">
+      <h2>Eredményeid</h2>
+      <div class="summary">
+        <div><span>💚 Megspórolt:</span><b id="totalSaved">0 Ft</b></div>
+        <div><span>💸 Elköltött:</span><b id="totalSpent">0 Ft</b></div>
+        <div class="muted"><span>🧮 Egyenleg:</span><b id="net">0 Ft</b></div>
+      </div>
 
-.card {
-  background: var(--card);
-  box-shadow: var(--shadow);
-  border-radius: var(--radius);
-  padding: 25px;
-  width: 90%;
-  max-width: 420px;
-  margin: 25px auto;
-  animation: fadeInUp 0.4s ease;
-}
+      <ul id="itemList" class="item-list"></ul>
 
-h2 {
-  text-align: center;
-  color: var(--blue);
-  margin-bottom: 20px;
-}
+      <div class="row mt">
+        <button id="clearAll" class="btn ghost">Lista ürítése</button>
+      </div>
+    </section>
+  </main>
 
-.form-group {
-  margin-bottom: 14px;
-}
+  <!-- Coach buborék -->
+  <div id="coachBubble" class="bubble hidden"></div>
 
-label {
-  display: block;
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 4px;
-}
+  <footer>© 2025 Munkaóra</footer>
 
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1.5px solid #e2e8f0;
-  font-size: 16px;
-  transition: border 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
-  outline: none;
-}
-
-.btn {
-  width: 100%;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  color: #fff;
-  margin-top: 8px;
-  transition: transform 0.1s ease, box-shadow 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.btn.blue { background: var(--blue); }
-.btn.green { background: var(--green); }
-.btn.red { background: var(--red); }
-.btn.yellow { background: var(--yellow); color: #111; }
-
-#summary {
-  text-align: center;
-  font-weight: 500;
-  margin-bottom: 16px;
-}
-
-#itemList {
-  list-style: none;
-  padding: 0;
-}
-
-#itemList li {
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  display: flex;
-  justify-content: space-between;
-}
-
-li.saved { color: var(--green); }
-li.spent { color: var(--red); }
-
-footer {
-  text-align: center;
-  font-size: 13px;
-  color: #999;
-  margin-top: auto;
-  padding: 20px;
-}
-
-.bubble {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  background: var(--blue);
-  color: white;
-  padding: 14px 18px;
-  border-radius: 20px 20px 4px 20px;
-  box-shadow: 0 8px 20px rgba(26, 115, 232, 0.2);
-  font-size: 15px;
-  animation: pop 0.4s ease;
-}
-
-.hidden { display: none; }
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pop {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
