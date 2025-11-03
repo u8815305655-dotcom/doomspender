@@ -1,47 +1,72 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Apádhelyett Anyád 🫨</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header>
     <h1>Apádhelyett Anyád 🫨</h1>
+    <p class="subtitle">a spórolás lelkiismeretes segítője 💸</p>
   </header>
 
   <main>
-    <section id="profile-section" class="card">
+    <section id="profile-section" class="card visible">
       <h2>Profilod</h2>
-      <label>Név: <input id="name" type="text" /></label>
-      <label>Kor: <input id="age" type="number" /></label>
-      <label>Havi nettó fizetés (Ft): <input id="salary" type="number" /></label>
-      <label>Heti munkaórák: <input id="hours" type="number" /></label>
-<button id="saveProfile" class="green">Mentés</button>
+      <div class="form-group">
+        <label>Név</label>
+        <input id="name" type="text" placeholder="Add meg a beceneved">
+      </div>
+      <div class="form-group">
+        <label>Kor</label>
+        <input id="age" type="number" placeholder="Add meg a korod">
+      </div>
+      <div class="form-group">
+        <label>Havi nettó fizetés (Ft)</label>
+        <input id="salary" type="number" placeholder="Pl. 450000">
+      </div>
+      <div class="form-group">
+        <label>Heti munkaórák</label>
+        <input id="hours" type="number" placeholder="Pl. 40">
+      </div>
+      <button id="saveProfile" class="btn primary">Mentés</button>
     </section>
 
     <section id="calculator-section" class="card hidden">
-      <h2>Mit szeretnél venni?</h2>
-      <label>Termék neve: <input id="itemName" type="text" /></label>
-      <label>Termék ára (Ft): <input id="itemPrice" type="number" /></label>
-      <button id="calcButton" class="yellow">Kiszámolom</button>
-      <div id="decisionButtons" class="hidden">
-        <button id="saveButton" class="green">Megspórolom</button>
-        <button id="buyButton" class="red">Megveszem</button>
+      <h2>Kalkulátor</h2>
+      <div class="form-group">
+        <label>Termék neve</label>
+        <input id="itemName" type="text" placeholder="Mit szeretnél venni?">
       </div>
-      <p id="calcResult"></p>
+      <div class="form-group">
+        <label>Termék ára (Ft)</label>
+        <input id="itemPrice" type="number" placeholder="Pl. 19990">
+      </div>
+      <button id="calcButton" class="btn accent">Kiszámolom</button>
+
+      <div id="decisionButtons" class="hidden fade-in">
+        <button id="saveButton" class="btn green">Megspórolom 💚</button>
+        <button id="buyButton" class="btn red">Megveszem 💸</button>
+      </div>
+
+      <p id="calcResult" class="result-text"></p>
     </section>
 
     <section id="results-section" class="card hidden">
-      <h2>Eredmények</h2>
-      <div id="summary">
-        <p>Összesen megspóroltál: <span id="totalSaved">0</span> Ft</p>
-        <p>Összesen elköltöttél: <span id="totalSpent">0</span> Ft</p>
+      <h2>Eredményeid</h2>
+      <div id="summary" class="summary">
+        <div><span>💚 Megspórolt összeg:</span><b id="totalSaved">0 Ft</b></div>
+        <div><span>💸 Elköltött összeg:</span><b id="totalSpent">0 Ft</b></div>
       </div>
-      <ul id="itemList"></ul>
+      <ul id="itemList" class="item-list"></ul>
     </section>
   </main>
+
+  <footer>
+    <p>© 2025 Apádhelyett Anyád 🫨</p>
+  </footer>
 
   <script type="module" src="js/app.js"></script>
 </body>
