@@ -3,49 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Munkaóra – Apádhelyett Anyád</title>
+  <title>Munkaóra – Apádhelyett Anyád 😏</title>
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <main class="wrap">
-    <h1>Munkaóra</h1>
-    <p class="subtitle">Tudd, hány órát dolgozol a vágyaidért. <span class="tag">+ Apádhelyett Anyád 😏</span></p>
+  <div class="app-container">
+    <header class="hero">
+      <h1>Munkaóra</h1>
+      <p class="subtitle">Tudd, hány órát dolgozol a vágyaidért.<br />
+        <span class="tag">+ Apádhelyett Anyád 😏</span>
+      </p>
+    </header>
 
-    <section class="card">
+    <main class="card">
       <h2>Profilod</h2>
+      <form id="profileForm" autocomplete="off">
+        <div class="form-group">
+          <label for="name">Becenév:</label>
+          <input type="text" id="name" name="name" placeholder="Add meg a neved..." required />
+        </div>
 
-      <div class="form-group">
-        <label for="name">Becenév:</label>
-        <input type="text" id="name" placeholder="Add meg a neved..." />
-      </div>
+        <div class="form-group">
+          <label for="age">Kor:</label>
+          <input type="number" id="age" name="age" placeholder="Hány éves vagy?" required />
+        </div>
 
-      <div class="form-group">
-        <label for="age">Kor:</label>
-        <input type="number" id="age" placeholder="Hány éves vagy?" />
-      </div>
+        <div class="form-group">
+          <label for="salary">Nettó havi fizetés (Ft):</label>
+          <input type="number" id="salary" name="salary" placeholder="pl. 400000" required />
+        </div>
 
-      <div class="form-group">
-        <label for="salary">Nettó havi fizetés (Ft):</label>
-        <input type="number" id="salary" placeholder="pl. 400000" />
-      </div>
+        <div class="form-group">
+          <label for="hours">Heti munkaórák:</label>
+          <input type="number" id="hours" name="hours" placeholder="pl. 40" required />
+        </div>
 
-      <div class="form-group">
-        <label for="hours">Heti munkaórák:</label>
-        <input type="number" id="hours" placeholder="pl. 40" />
-      </div>
-
-      <div class="button-row">
-        <button id="saveProfile" class="btn blue">Mentés</button>
-        <button id="deleteProfile" class="btn gray">Profil törlése</button>
-      </div>
-    </section>
+        <div class="button-row">
+          <button type="button" id="saveProfile" class="btn blue">Mentés</button>
+          <button type="button" id="deleteProfile" class="btn gray">Profil törlése</button>
+        </div>
+      </form>
+    </main>
 
     <footer>
       <p>© 2025 Munkaóra • <span class="accent">Apádhelyett Anyád 😏</span></p>
     </footer>
-  </main>
+  </div>
 
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js?v=2"></script>
 </body>
 </html>
