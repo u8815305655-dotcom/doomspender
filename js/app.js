@@ -2,21 +2,20 @@ import { reactionMessages } from "../data/messages.js";
 import { DataLayer } from "./dataLayer.js";
 
 
-const $ = s => document.querySelector(s);
-const fmtFt = v => new Intl.NumberFormat("hu-HU",{style:"currency",currency:"HUF",maximumFractionDigits:0}).format(Number(v||0));
+document.querySelector("#saveProfile").addEventListener("click", () => {
+  const name = document.querySelector("#name").value;
+  const age = document.querySelector("#age").value;
+  const salary = document.querySelector("#salary").value;
+  const hours = document.querySelector("#hours").value;
 
-const state = {
-  profile: null,
-  items: [],
-  current: null // {id,name,price,hours}
-};
+  if (name && age && salary && hours) {
+    localStorage.setItem("profile", JSON.stringify({ name, age, salary, hours }));
+    window.location.href = "app.html"; // vagy az a lap, ahová továbblépni kell
+  } else {
+    alert("Kérlek, töltsd ki az összes mezőt!");
+  }
+});
 
-async function boot(){
-  state.profile = await DataLayer.getProfile();
-  state.items = await DataLayer.getItems();
-  bindUI();
-  hydrateUI();
-}
 
 function bindUI(){
   $("#saveProfile").addEventListener("click", onSaveProfile);
