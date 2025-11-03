@@ -2,68 +2,50 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Munkaóra</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Munkaóra – Apádhelyett Anyád</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <header class="hero">
+  <main class="wrap">
     <h1>Munkaóra</h1>
-    <p class="subtitle">Tudd, hány órát dolgozol a vágyaidért. <span class="coach-tag">+ Apádhelyett Anyád 🫨</span></p>
-  </header>
+    <p class="subtitle">Tudd, hány órát dolgozol a vágyaidért. <span class="tag">+ Apádhelyett Anyád 😏</span></p>
 
-  <main>
-    <!-- PROFIL -->
-    <section id="profile-section" class="card">
+    <section class="card">
       <h2>Profilod</h2>
-      <div class="form-group"><label>Becenév</label><input id="name" type="text" placeholder="Add meg a beceneved"></div>
-      <div class="form-group"><label>Kor</label><input id="age" type="number" placeholder="Add meg a korod"></div>
-      <div class="form-group"><label>Nettó havi fizetés (Ft)</label><input id="salary" type="number" placeholder="Pl. 450000"></div>
-      <div class="form-group"><label>Heti munkaórák</label><input id="hours" type="number" placeholder="Pl. 40"></div>
-      <div class="row">
-<button id="saveProfile" class="btn blue">Mentés</button>
-        <button id="resetProfile" class="btn ghost">Profil törlése</button>
+
+      <div class="form-group">
+        <label for="name">Becenév:</label>
+        <input type="text" id="name" placeholder="Add meg a neved..." />
+      </div>
+
+      <div class="form-group">
+        <label for="age">Kor:</label>
+        <input type="number" id="age" placeholder="Hány éves vagy?" />
+      </div>
+
+      <div class="form-group">
+        <label for="salary">Nettó havi fizetés (Ft):</label>
+        <input type="number" id="salary" placeholder="pl. 400000" />
+      </div>
+
+      <div class="form-group">
+        <label for="hours">Heti munkaórák:</label>
+        <input type="number" id="hours" placeholder="pl. 40" />
+      </div>
+
+      <div class="button-row">
+        <button id="saveProfile" class="btn blue">Mentés</button>
+        <button id="deleteProfile" class="btn gray">Profil törlése</button>
       </div>
     </section>
 
-    <!-- KALKULÁTOR -->
-    <section id="calculator-section" class="card hidden">
-      <h2>Kalkulátor</h2>
-      <div class="form-group"><label>Termék neve</label><input id="itemName" type="text" placeholder="Mit szeretnél venni?"></div>
-      <div class="form-group"><label>Termék ára (Ft)</label><input id="itemPrice" type="number" placeholder="Pl. 19990"></div>
-      <button id="calcButton" class="btn yellow">Kiszámolom</button>
-
-      <div id="calcResultWrap" class="hidden">
-        <p id="calcResult" class="result-text"></p>
-        <div id="decisionButtons" class="row">
-          <button id="saveButton" class="btn green">Megspórolom 💚</button>
-          <button id="buyButton" class="btn red">Megveszem 💸</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- EREDMÉNYEK -->
-    <section id="results-section" class="card hidden">
-      <h2>Eredményeid</h2>
-      <div class="summary">
-        <div><span>💚 Megspórolt:</span><b id="totalSaved">0 Ft</b></div>
-        <div><span>💸 Elköltött:</span><b id="totalSpent">0 Ft</b></div>
-        <div class="muted"><span>🧮 Egyenleg:</span><b id="net">0 Ft</b></div>
-      </div>
-
-      <ul id="itemList" class="item-list"></ul>
-
-      <div class="row mt">
-        <button id="clearAll" class="btn ghost">Lista ürítése</button>
-      </div>
-    </section>
+    <footer>
+      <p>© 2025 Munkaóra • <span class="accent">Apádhelyett Anyád 😏</span></p>
+    </footer>
   </main>
 
-  <!-- Coach buborék -->
-  <div id="coachBubble" class="bubble hidden"></div>
-
-  <footer>© 2025 Munkaóra</footer>
-
-<script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
