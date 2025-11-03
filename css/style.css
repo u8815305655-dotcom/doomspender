@@ -1,1 +1,149 @@
+:root {
+  --bg: #f9f9fb;
+  --text: #111;
+  --muted: #6b7280;
+  --accent: #3b82f6;
+  --success: #10b981;
+  --danger: #ef4444;
+  --card: #ffffff;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 1rem;
+}
+
+.card {
+  background: var(--card);
+  box-shadow: var(--shadow);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.75rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+button.yellow {
+  background: #facc15;
+  color: #111;
+}
+
+button.green {
+  background: var(--success);
+  color: white;
+}
+
+button.red {
+  background: var(--danger);
+  color: white;
+}
+
+nav {
+  display: flex;
+  justify-content: space-around;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+  padding: 0.75rem 0;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+nav button.active {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+}
+
+.result-list {
+  list-style: none;
+  padding: 0;
+}
+
+.result-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #eee;
+  font-size: 1rem;
+}
+
+.result-list li.red {
+  color: var(--danger);
+}
+
+.result-list li.green {
+  color: var(--success);
+}
+
+.summary {
+  margin-top: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+}
 
