@@ -76,6 +76,33 @@
       border-radius:16px; padding:12px; background:linear-gradient(180deg,#ffffff, #f8fafc);
       border:1px solid #eef2ff; box-shadow:0 8px 24px rgba(2,6,23,.06)
     }
+
+    /* Coach (Apádhelyett Anyád) */
+    .coach-wrap{
+      position: fixed; right: 1rem; bottom: 1rem; z-index: 60;
+      display:flex; align-items:flex-end; gap:.5rem;
+    }
+    .coach-avatar{
+      width:44px; height:44px; border-radius:50%;
+      background: linear-gradient(135deg, #ffffff, #f0f9ff);
+      border:1px solid #e2e8f0;
+      box-shadow: 0 8px 24px rgba(2,6,23,.12);
+      display:flex; align-items:center; justify-content:center; font-size:22px;
+    }
+    .coach-bubble{
+      max-width: 74vw; background:#ffffff; border:1px solid #e2e8f0;
+      box-shadow:0 10px 24px rgba(2,6,23,.10);
+      border-radius:14px; padding:10px 12px; font-size:14px;
+      transform-origin: 100% 100%; opacity:0; transform: scale(.96);
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .coach-bubble:after{
+      content:''; position:absolute; right:52px; bottom:10px;
+      border-width:7px; border-style:solid;
+      border-color:#ffffff transparent transparent transparent;
+      filter: drop-shadow(0 -1px 0 #e2e8f0);
+    }
+    .coach-wrap.show .coach-bubble{ opacity:1; transform: scale(1) }
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -210,7 +237,7 @@
 
   </main>
 
-  <!-- MODAL -->
+  <!-- MODAL (10+ óra esetén ejnye-üzenetek) -->
   <div id="modal" class="hidden fixed inset-0 bg-black/50 z-50">
     <div class="min-h-full flex items-center justify-center p-4">
       <div class="w-full max-w-sm card">
@@ -221,6 +248,15 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- COACH: Apádhelyett Anyád 🫨 -->
+  <div id="coach" class="coach-wrap hidden">
+    <div class="coach-bubble relative" id="coachBubble">
+      <strong>Apádhelyett Anyád 🫨</strong><br>
+      <span id="coachText">Figyelek ám…</span>
+    </div>
+    <div class="coach-avatar">🫨</div>
   </div>
 
   <script>
@@ -241,6 +277,7 @@
 
     // ---------- App state ----------
     let latestCalc = null; // { name, price, hours, hourly }
+    let coachTimer = null;
 
     // ---------- UI elérések ----------
     const el = {
@@ -283,10 +320,14 @@
       modal: qs('#modal'),
       modalText: qs('#modalText'),
       closeModal: qs('#closeModal'),
+      // coach
+      coach: qs('#coach'),
+      coachText: qs('#coachText'),
+      coachBubble: qs('#coachBubble'),
     };
 
-    // ---------- Üzenetek (100+) ----------
-    const messages = [
+    // ---------- Üzenetek (100+) a 10+ órás KÖLTÉS modálhoz ----------
+    const heavyBuyMessages = [
       "Ejha, ennyit melózni ezért? 😅",
       "Remélem, tényleg megérte!",
       "A lelkiismereted most elment kávézni.",
@@ -405,7 +446,44 @@
       "Ha kihasználod, oké. Ha dobozban marad, ejnye.",
       "A döntésed történetet mesél – csak drágát."
     ];
-    // 100+ üzenet (110 felett)
+
+    // Coach üzenetek (pozitív / semleges / negatív)
+    const coachPositive = [
+      "Szép munka, {nick}! A jövőbeli én tapsol. 👏",
+      "Na, végre egy döntés, amire nem sírok rá. 🫨",
+      "Ezt anyád is megdicsérné. Mármint én. 😌",
+      "Minden spórolt forint egy kis szabadság.",
+      "Ügyes! A bankszámlád most mosolyog.",
+      "Ha így folytatod, én is nyugodtabban alszom.",
+      "Okos döntés – és még stílusos is.",
+      "Egy nap, egy jó döntés. Megy ez. 💪",
+      "Büszke vagyok rád, de ne bízd el magad. 😉",
+      "A tudatosság menő. Pont."
+    ];
+    const coachNeutral = [
+      "Számolunk, számolunk… kávéval jobb lenne.",
+      "Oké, de csak akkor, ha tényleg kell.",
+      "Nézz rá még egyszer az árra. Csak úgy, pedagógiailag.",
+      "Az árak nem viccelnek, de mi igen.",
+      "Ha jobb ötleted van, szólj. Addig számolok. 🫨",
+      "A matek nem hazudik – de néha csúnyán néz.",
+      "Én itt vagyok, hogy szóljak, ha elgurul a pénz.",
+      "Ne aggódj, nem harapok. Csak szólok.",
+      "Két kattintás között gondolkodunk is.",
+      "Szusszanj meg, aztán dönts."
+    ];
+    const coachNegative = [
+      "Huh, {nick}… ez most fájt egy kicsit.",
+      "Nem mondom, hogy büszke vagyok.",
+      "Ennyit melózni érte? Gondold át még egyszer.",
+      "A pénztárcád sír. Én is kicsit.",
+      "Ez drága lecke lehet. Tanulunk, oké?",
+      "Ha örömöt hoz, maradjon. Ha státusz, ejnye.",
+      "Az időd arany. Ne szórd szét.",
+      "Tíz órán túl már dráma. Kíméld magad.",
+      "A jövőbeli te most fintorog.",
+      "Csak kérdezem: biztos, hogy kell?"
+    ];
 
     // ---------- Init ----------
     function init(){
@@ -442,6 +520,7 @@
         setProfile({ nick, age, salary:s, hours:h });
         applyGreeting();
         showOnly('calc');
+        showCoach('positive', `Na végre, bemutatkoztál, ${nick}. Most már hivatalosan is vigyázok rád. 😉`);
       });
       el.cancelProfile.addEventListener('click', ()=>{
         const p = getProfile();
@@ -496,6 +575,8 @@
       el.workResult.textContent = `Ez kb. ${hours.toFixed(1)} munkaórádba kerülne.`;
       el.workSub.textContent = `${name} ára: ${fmtFt(price)} • Órabéred ~ ${fmtFt(hourly)}`;
       el.calcBox.classList.remove('hidden');
+
+      showCoach('neutral', pickCoach(coachNeutral, p.nick));
     }
 
     function decide(type){
@@ -511,11 +592,18 @@
       renderList();
       showOnly('results');
 
-      // Modal, ha > 10 óra és „Megveszem”
-      if(type === 'buy' && latestCalc.hours > 10){
-        const msg = messages[Math.floor(Math.random()*messages.length)];
-        el.modalText.textContent = msg;
-        el.modal.classList.remove('hidden');
+      const p = getProfile();
+      if(type === 'buy'){
+        // Modal, ha > 10 óra
+        if(latestCalc.hours > 10){
+          el.modalText.textContent = heavyBuyMessages[Math.floor(Math.random()*heavyBuyMessages.length)];
+          el.modal.classList.remove('hidden');
+          showCoach('negative', pickCoach(coachNegative, p?.nick));
+        }else{
+          showCoach('neutral', "Oké, de csak használd is. 😉");
+        }
+      } else {
+        showCoach('positive', pickCoach(coachPositive, p?.nick));
       }
 
       // reset calculator inputs + box
@@ -535,12 +623,14 @@
       el.quickName.value = '';
       el.quickPrice.value = '';
       renderList();
+      showCoach(type==='save' ? 'positive' : 'neutral', type==='save' ? "Okos húzás." : "Rögzítve. Figyellek.");
     }
 
     function removeItem(id){
       const items = getItems().filter(x=>x.id !== id);
       setItems(items);
       renderList();
+      showCoach('neutral', "Törölve. Tiszta lap, tiszta lelkiismeret.");
     }
 
     function renderList(){
@@ -585,6 +675,37 @@
       el.resultList.querySelectorAll('[data-del]').forEach(btn=>{
         btn.addEventListener('click', ()=> removeItem(Number(btn.getAttribute('data-del'))));
       });
+    }
+
+    // ---------- Coach megjelenítés ----------
+    function pickCoach(arr, nick){
+      const raw = arr[Math.floor(Math.random()*arr.length)];
+      return raw.replaceAll('{nick}', nick || 'barátom');
+    }
+    function showCoach(kind, text){
+      const c = el.coach;
+      const bubble = el.coachBubble;
+      const colors = {
+        positive: 'border-green-200',
+        neutral:  'border-slate-200',
+        negative: 'border-red-200'
+      };
+      el.coachText.textContent = text;
+      // reset border
+      bubble.classList.remove('border-green-200','border-slate-200','border-red-200');
+      bubble.classList.add(colors[kind] || 'border-slate-200');
+
+      c.classList.remove('hidden');
+      // trigger fade-in
+      requestAnimationFrame(()=> c.classList.add('show'));
+
+      // auto-hide after 5s
+      if(coachTimer) clearTimeout(coachTimer);
+      coachTimer = setTimeout(()=>{
+        c.classList.remove('show');
+        // wait transition then hide
+        setTimeout(()=> c.classList.add('hidden'), 220);
+      }, 5000);
     }
 
     function escapeHtml(str){ return str.replace(/[&<>'"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
