@@ -1,174 +1,190 @@
+// --- Importok ---
 import { reactionMessages } from "../data/messages.js";
-import { DataLayer } from "./dataLayer.js";
 
+// --- Alapállapot ---
+const state = {
+  name: "",
+  age: null,
+  salary: null,
+  hours: null,
+  saved: [],
+  spent: [],
+};
 
-document.querySelector("#saveProfile").addEventListener("click", () => {
-  const name = document.querySelector("#name").value;
-  const age = document.querySelector("#age").value;
-  const salary = document.querySelector("#salary").value;
-  const hours = document.querySelector("#hours").value;
+// --- Segédfüggvények ---
+const $ = (s) => document.querySelector(s);
+const createEl = (t, c = "", txt = "") => {
+  const el = document.createElement(t);
+  if (c) el.className = c;
+  if (txt) el.innerText = txt;
+  return el;
+};
 
-  if (name && age && salary && hours) {
-    localStorage.setItem("profile", JSON.stringify({ name, age, salary, hours }));
-    window.location.href = "app.html"; // vagy az a lap, ahová továbblépni kell
-  } else {
+// --- Adatmentés ---
+function saveProfile() {
+  const name = $("#name").value.trim();
+  const age = $("#age").value.trim();
+  const salary = $("#salary").value.trim();
+  const hours = $("#hours").value.trim();
+
+  if (!name || !age || !salary || !hours) {
     alert("Kérlek, töltsd ki az összes mezőt!");
-  }
-});
-
-
-function bindUI(){
-  $("#saveProfile").addEventListener("click", onSaveProfile);
-  $("#resetProfile").addEventListener("click", onResetProfile);
-
-  $("#calcButton").addEventListener("click", onCalc);
-  $("#saveButton").addEventListener("click", () => onDecision("save"));
-  $("#buyButton").addEventListener("click", () => onDecision("buy"));
-
-  $("#clearAll").addEventListener("click", async ()=>{
-    if(!confirm("Biztos törlöd az összes tételt?")) return;
-    await DataLayer.clearAll(); state.items=[]; renderResults();
-  });
-}
-
-function hydrateUI(){
-  if(state.profile){
-    $("#profile-section").classList.add("hidden");
-    $("#calculator-section").classList.remove("hidden");
-    $("#results-section").classList.remove("hidden");
-    renderResults();
-  }else{
-    $("#profile-section").classList.remove("hidden");
-    $("#calculator-section").classList.add("hidden");
-    $("#results-section").classList.add("hidden");
-  }
-}
-
-async function onSaveProfile(){
-  const profile = {
-    name: $("#name").value.trim(),
-    age: Number($("#age").value),
-    salary: Number($("#salary").value),
-    hours: Number($("#hours").value),
-  };
-  if(!profile.name || !profile.age || !profile.salary || !profile.hours){
-    coach("Tölts ki minden mezőt, kérlek."); return;
-  }
-  await DataLayer.saveProfile(profile);
-  state.profile = profile;
-  coach(`Szia ${profile.name}! Készen állsz az okos döntésekre. 😎`);
-  hydrateUI();
-}
-
-async function onResetProfile(){
-  if(!confirm("Biztos törlöd a profilodat? (Az adatok megmaradnak)")) return;
-  await DataLayer.deleteProfile(); state.profile=null; hydrateUI();
-}
-
-function onCalc(){
-  const name = $("#itemName").value.trim();
-  const price = Number($("#itemPrice").value);
-  if(!name || !price || !state.profile){ coach("Add meg a nevet és az árat!"); return; }
-
-  const hourly = state.profile.salary / (state.profile.hours * 4);
-  const hours = price / hourly;
-
-  state.current = { id: Date.now(), name, price, hours };
-
-  $("#calcResult").textContent = `Ez kb. ${hours.toFixed(1)} munkaórád.`;
-  $("#calcResultWrap").classList.remove("hidden");
-}
-
-async function onDecision(type){
-  if(!state.current) return;
-  const item = {
-    id: state.current.id,
-    name: state.current.name,
-    price: state.current.price,
-    type, // "save" | "buy"
-    hours: state.current.hours
-  };
-  await DataLayer.saveItem(item);
-  state.items.unshift(item);
-
-  if(type==="buy"){
-    if(item.hours>10){
-      const msg = reactionMessages[Math.floor(Math.random()*reactionMessages.length)];
-      coach(msg);
-    }else{
-      coach("Oké, megvetted – használd örömmel. 🛍️");
-    }
-  }else{
-    coach("Szép döntés! A jövőbeli én tapsol. 👏");
-  }
-
-  // reset decision area
-  $("#calcResultWrap").classList.add("hidden");
-  $("#itemName").value = "";
-  $("#itemPrice").value = "";
-
-  renderResults();
-}
-
-function renderResults(){
-  // totals
-  const saved = state.items.filter(x=>x.type==="save").reduce((s,x)=>s+x.price,0);
-  const spent = state.items.filter(x=>x.type==="buy").reduce((s,x)=>s+x.price,0);
-  $("#totalSaved").textContent = fmtFt(saved);
-  $("#totalSpent").textContent = fmtFt(spent);
-  $("#net").textContent = fmtFt(saved - spent);
-
-  // list
-  const ul = $("#itemList"); ul.innerHTML = "";
-  if(state.items.length===0){
-    ul.innerHTML = `<li class="muted">Még nincs tétel. Kezdd a kalkulátorral.</li>`;
     return;
   }
 
-  state.items.forEach(x=>{
-    const li = document.createElement("li"); li.className="item";
-    const name = document.createElement("span"); name.className="name " + (x.type==="buy"?"bad":"good"); name.textContent = x.name;
-    const price = document.createElement("span"); price.className="price"; price.textContent = fmtFt(x.price);
-    const actions = document.createElement("span"); actions.className="actions";
-    const del = document.createElement("button"); del.className="action del"; del.textContent="Törlöm";
-    del.onclick = async ()=>{ await DataLayer.deleteItem(x.id); state.items = state.items.filter(i=>i.id!==x.id); renderResults(); };
-    const edit = document.createElement("button"); edit.className="action edit"; edit.textContent="Szerk.";
-    edit.onclick = ()=> inlineEdit(x.id);
-    actions.append(edit, del);
-    li.append(name, price, actions);
-    ul.appendChild(li);
+  state.name = name;
+  state.age = age;
+  state.salary = parseInt(salary);
+  state.hours = parseInt(hours);
+
+  localStorage.setItem("profile", JSON.stringify(state));
+
+  // Tovább a kalkulátorhoz
+  window.location.href = "calculator.html";
+}
+
+// --- Profil törlése ---
+function deleteProfile() {
+  if (confirm("Biztosan törlöd a profilod?")) {
+    localStorage.removeItem("profile");
+    window.location.reload();
+  }
+}
+
+// --- Kalkuláció ---
+function calculateHours(cost) {
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (!profile) return 0;
+  const hourly = profile.salary / (profile.hours * 4); // heti -> havi
+  return (cost / hourly).toFixed(1);
+}
+
+// --- Apádhelyett Anyád reakciók ---
+function getReaction(cost, action) {
+  if (action === "save") {
+    const positive = reactionMessages.positive;
+    return positive[Math.floor(Math.random() * positive.length)];
+  } else {
+    if (cost > 10) {
+      const warning = reactionMessages.warning;
+      return warning[Math.floor(Math.random() * warning.length)];
+    } else {
+      const neutral = reactionMessages.neutral;
+      return neutral[Math.floor(Math.random() * neutral.length)];
+    }
+  }
+}
+
+// --- Kalkulátor logika ---
+function initCalculator() {
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (!profile) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const inputName = $("#productName");
+  const inputPrice = $("#productPrice");
+  const resultSection = $("#result");
+  const calcBtn = $("#calcBtn");
+
+  calcBtn.addEventListener("click", () => {
+    const name = inputName.value.trim();
+    const price = parseFloat(inputPrice.value);
+
+    if (!name || !price || price <= 0) {
+      alert("Add meg a termék nevét és árát!");
+      return;
+    }
+
+    const hoursNeeded = calculateHours(price);
+    resultSection.innerHTML = `
+      <p>A termék ára <strong>${price.toLocaleString()} Ft</strong>.</p>
+      <p>Ez kb. <strong>${hoursNeeded}</strong> munkaóra!</p>
+      <div class="buttons">
+        <button id="saveBtn" class="btn green">Megspórolom</button>
+        <button id="buyBtn" class="btn red">Megveszem</button>
+      </div>
+    `;
+
+    $("#saveBtn").addEventListener("click", () => handleAction(name, price, "save"));
+    $("#buyBtn").addEventListener("click", () => handleAction(name, price, "buy"));
   });
 }
 
-function inlineEdit(id){
-  const li = Array.from(document.querySelectorAll("#itemList .item")).find((el,idx)=> state.items[idx].id===id);
-  if(!li) return;
-  const idx = Array.from(li.parentNode.children).indexOf(li);
-  const item = state.items[idx];
+// --- Akciók kezelése ---
+function handleAction(name, price, action) {
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (!profile) return;
 
-  li.innerHTML="";
-  const inputName = document.createElement("input"); inputName.value = item.name; inputName.className=""; inputName.style.marginRight="8px";
-  const inputPrice = document.createElement("input"); inputPrice.type="number"; inputPrice.value=item.price; inputPrice.style.maxWidth="140px";
-  const ok = document.createElement("button"); ok.className="action edit"; ok.textContent="OK";
-  const cancel = document.createElement("button"); cancel.className="action ghost"; cancel.textContent="Mégse";
+  const listKey = action === "save" ? "saved" : "spent";
+  profile[listKey].push({ name, price });
+  localStorage.setItem("profile", JSON.stringify(profile));
 
-  ok.onclick = async ()=>{
-    const patch = {name: inputName.value.trim(), price: Number(inputPrice.value)};
-    await DataLayer.updateItem(item.id, patch);
-    state.items[idx] = {...item, ...patch};
-    renderResults();
-  };
-  cancel.onclick = ()=> renderResults();
-
-  li.append(inputName, inputPrice, ok, cancel);
+  const reaction = getReaction(price, action);
+  showReaction(reaction);
 }
 
-function coach(text){
-  const b = $("#coachBubble");
-  b.textContent = text;
-  b.classList.remove("hidden");
-  clearTimeout(b._t);
-  b._t = setTimeout(()=> b.classList.add("hidden"), 4200);
+// --- Apádhelyett Anyád kiírás ---
+function showReaction(msg) {
+  let bubble = $(".bubble");
+  if (!bubble) {
+    bubble = createEl("div", "bubble");
+    document.body.appendChild(bubble);
+  }
+  bubble.innerText = `Apádhelyett Anyád 😏: ${msg}`;
+  bubble.classList.remove("hidden");
+  setTimeout(() => bubble.classList.add("hidden"), 4000);
 }
 
+// --- Listaoldal funkció ---
+function initList() {
+  const profile = JSON.parse(localStorage.getItem("profile"));
+  if (!profile) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const list = $("#itemList");
+  const totalSaved = $("#totalSaved");
+  const totalSpent = $("#totalSpent");
+
+  list.innerHTML = "";
+
+  let sumSaved = 0;
+  let sumSpent = 0;
+
+  profile.saved.forEach((item) => {
+    const li = createEl("li", "saved", `${item.name} – ${item.price} Ft`);
+    list.appendChild(li);
+    sumSaved += item.price;
+  });
+
+  profile.spent.forEach((item) => {
+    const li = createEl("li", "spent", `${item.name} – ${item.price} Ft`);
+    list.appendChild(li);
+    sumSpent += item.price;
+  });
+
+  totalSaved.innerText = sumSaved.toLocaleString() + " Ft";
+  totalSpent.innerText = sumSpent.toLocaleString() + " Ft";
+}
+
+// --- Oldalfüggő inicializálás ---
+function boot() {
+  if ($("#saveProfile")) {
+    $("#saveProfile").addEventListener("click", saveProfile);
+  }
+  if ($("#deleteProfile")) {
+    $("#deleteProfile").addEventListener("click", deleteProfile);
+  }
+  if ($("#calcBtn")) {
+    initCalculator();
+  }
+  if ($("#itemList")) {
+    initList();
+  }
+}
+
+// --- Start ---
 boot();
