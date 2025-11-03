@@ -8,25 +8,26 @@
   <style>
     :root{
       --accent:#00b3a4;        /* türkiz */
-      --accent2:#7c3aed;       /* lila highlight */
+      --accent2:#7c3aed;       /* lila */
       --good:#16a34a;          /* zöld */
       --bad:#dc2626;           /* piros */
+      --ink:#0f172a;
       --glass: rgba(255,255,255,.6);
     }
     html,body{height:100%}
     body{
       background:
-        radial-gradient(1300px 700px at -10% -10%, #e0f7f5 0%, transparent 60%),
-        radial-gradient(1200px 700px at 110% 10%, #efe7ff 0%, transparent 55%),
+        radial-gradient(1200px 700px at -10% -10%, #e0f7f5 0%, transparent 60%),
+        radial-gradient(1100px 650px at 110% 10%, #efe7ff 0%, transparent 55%),
         linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:#0f172a;
+      color: var(--ink);
     }
     .glass{
       background: var(--glass);
       backdrop-filter: blur(10px);
       box-shadow: 0 10px 30px rgba(15,23,42,.08);
-      border:1px solid rgba(255,255,255,.5);
+      border:1px solid rgba(255,255,255,.55);
     }
     .card{
       border-radius: 18px;
@@ -69,13 +70,11 @@
     .chip{
       padding:6px 10px; border-radius:9999px; background:#f1f5f9; font-size:12px; color:#334155
     }
-    .floating{
-      animation: floaty 6s ease-in-out infinite;
-    }
-    @keyframes floaty{
-      0%{ transform: translateY(0) }
-      50%{ transform: translateY(-6px) }
-      100%{ transform: translateY(0) }
+    .floating{ animation: floaty 6s ease-in-out infinite; }
+    @keyframes floaty{ 0%{transform:translateY(0)} 50%{transform:translateY(-6px)} 100%{transform:translateY(0)} }
+    .stat{
+      border-radius:16px; padding:12px; background:linear-gradient(180deg,#ffffff, #f8fafc);
+      border:1px solid #eef2ff; box-shadow:0 8px 24px rgba(2,6,23,.06)
     }
   </style>
 </head>
@@ -89,7 +88,7 @@
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 rounded-xl"
              style="background:linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%); box-shadow:0 6px 16px rgba(124,58,237,.25)"></div>
-        <strong>Munkaóra</strong>
+        <strong id="brandTitle">Munkaóra</strong>
       </div>
       <div class="flex items-center gap-2">
         <button id="goCalc" class="chip">Számoló</button>
@@ -115,7 +114,13 @@
     <!-- PROFILE -->
     <section id="screen-profile" class="card hidden">
       <h2 class="title mb-2">Profil beállítás</h2>
-      <p class="sub mb-3 text-sm">Nettó bér és heti munkaórák alapján számolunk. Később bármikor módosíthatod.</p>
+      <p class="sub mb-3 text-sm">Név, életkor, nettó bér és heti munkaórák alapján számolunk. Később bármikor módosíthatod.</p>
+
+      <label class="block text-sm font-semibold mb-1">Becenév</label>
+      <input id="nick" type="text" class="input mb-3" placeholder="pl. Bence">
+
+      <label class="block text-sm font-semibold mb-1">Életkor</label>
+      <input id="age" type="number" inputmode="numeric" class="input mb-3" placeholder="pl. 28">
 
       <label class="block text-sm font-semibold mb-1">Nettó havi fizetés (Ft)</label>
       <input id="salary" type="number" inputmode="numeric" class="input mb-3" placeholder="pl. 420000">
@@ -131,7 +136,10 @@
 
     <!-- CALCULATOR -->
     <section id="screen-calc" class="card hidden">
-      <h2 class="title mb-2">Új számítás</h2>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="title">Új számítás</h2>
+        <span id="helloNick" class="text-sm text-slate-500"></span>
+      </div>
       <p class="sub text-sm mb-3">Add meg a terméket és az árát.</p>
 
       <label class="block text-sm font-semibold mb-1">Termék neve</label>
@@ -159,6 +167,25 @@
       <div class="flex items-center justify-between mb-2">
         <h2 class="title">Eredmények</h2>
         <button id="clearList" class="chip">Lista törlése</button>
+      </div>
+
+      <!-- Summary stat -->
+      <div id="summary" class="stat mb-3">
+        <div class="flex items-center justify-between text-sm">
+          <div class="flex-1">
+            <div class="text-slate-500">Spórolt összesen</div>
+            <div id="sumSaved" class="font-bold text-green-600 tabular-nums">0 Ft</div>
+          </div>
+          <div class="w-px h-8 bg-slate-200 mx-3"></div>
+          <div class="flex-1">
+            <div class="text-slate-500">Elköltött összesen</div>
+            <div id="sumBought" class="font-bold text-red-600 tabular-nums">0 Ft</div>
+          </div>
+        </div>
+        <div class="mt-2 text-sm">
+          <span class="text-slate-500">Egyenleg:</span>
+          <span id="sumNet" class="font-semibold">0 Ft</span>
+        </div>
       </div>
 
       <ul id="resultList" class="divide-y divide-slate-100"></ul>
@@ -218,12 +245,16 @@
     // ---------- UI elérések ----------
     const el = {
       // nav
+      brandTitle: qs('#brandTitle'),
+      helloNick: qs('#helloNick'),
       goCalc: qs('#goCalc'),
       goResults: qs('#goResults'),
       goProfile: qs('#goProfile'),
       // welcome
       startBtn: qs('#startBtn'),
       // profile
+      nick: qs('#nick'),
+      age: qs('#age'),
       salary: qs('#salary'),
       hours: qs('#hours'),
       saveProfile: qs('#saveProfile'),
@@ -245,6 +276,9 @@
       quickAddSave: qs('#quickAddSave'),
       quickAddBuy: qs('#quickAddBuy'),
       backToCalc: qs('#backToCalc'),
+      sumSaved: qs('#sumSaved'),
+      sumBought: qs('#sumBought'),
+      sumNet: qs('#sumNet'),
       // modal
       modal: qs('#modal'),
       modalText: qs('#modalText'),
@@ -315,11 +349,11 @@
       "A jéghideg zuhany a hó végén jön.",
       "Extra órák incoming.",
       "Szeresd. Mert sok munkaóra szeretne viszontlátni.",
-      "A jövőbeli te: „na jó, legyen, csak használd”",
+      "A jövőbeli te: „na jó, legyen, csak használd”.",
       "Minimum 10 óra – maximum remény.",
       "A boldogság ára: pontosan ennyi.",
       "Ez a „megérdemlem” deluxe csomagja.",
-      "A racionalitás üzenete: “visszahívjuk.”",
+      "A racionalitás üzenete: „visszahívjuk.”",
       "Ha értéket hoz, szent. Ha porosodik, bűn.",
       "A költségvetés most nyújtózik.",
       "A minimalista szíved most kihagyott egy ütemet.",
@@ -371,16 +405,21 @@
       "Ha kihasználod, oké. Ha dobozban marad, ejnye.",
       "A döntésed történetet mesél – csak drágát."
     ];
-    // 100 fölött vagyunk (110+)
+    // 100+ üzenet (110 felett)
 
-    // ---------- Működés ----------
+    // ---------- Init ----------
     function init(){
       // Nav
       el.goCalc.addEventListener('click', ()=> showOnly('calc'));
       el.goResults.addEventListener('click', ()=> { renderList(); showOnly('results'); });
       el.goProfile.addEventListener('click', ()=> {
         const p = getProfile();
-        if(p){ el.salary.value = p.salary; el.hours.value = p.hours; }
+        if(p){
+          el.nick.value   = p.nick || '';
+          el.age.value    = p.age  || '';
+          el.salary.value = p.salary || '';
+          el.hours.value  = p.hours || '';
+        }
         showOnly('profile');
       });
 
@@ -390,12 +429,18 @@
         if(!p){ showOnly('profile'); } else { showOnly('calc'); }
       });
 
-      // Profile
+      // Profile save/cancel
       el.saveProfile.addEventListener('click', ()=>{
-        const s = Number(el.salary.value);
-        const h = Number(el.hours.value);
-        if(!s || !h || s < 0 || h <= 0){ alert('Kérlek, érvényes értékeket adj meg.'); return; }
-        setProfile({ salary:s, hours:h });
+        const nick = (el.nick.value||'').trim();
+        const age  = Number(el.age.value);
+        const s    = Number(el.salary.value);
+        const h    = Number(el.hours.value);
+        if(!nick || !age || !s || !h || age<=0 || s<=0 || h<=0){
+          alert('Kérlek, tölts ki minden mezőt érvényes értékkel.');
+          return;
+        }
+        setProfile({ nick, age, salary:s, hours:h });
+        applyGreeting();
         showOnly('calc');
       });
       el.cancelProfile.addEventListener('click', ()=>{
@@ -421,8 +466,20 @@
 
       // Start screen
       const p = getProfile();
+      applyGreeting();
       if(p){ showOnly('calc'); } else { showOnly('welcome'); }
       renderList();
+    }
+
+    function applyGreeting(){
+      const p = getProfile();
+      if(p && p.nick){
+        el.brandTitle.textContent = `Szia, ${p.nick} 👋`;
+        el.helloNick.textContent  = `${p.nick}, készen állsz?`;
+      }else{
+        el.brandTitle.textContent = 'Munkaóra';
+        el.helloNick.textContent  = '';
+      }
     }
 
     function doCalculate(){
@@ -488,6 +545,18 @@
 
     function renderList(){
       const list = getItems();
+
+      // Összegzés számítása
+      const totalSaved  = list.filter(x=>x.type==='save').reduce((s,x)=>s+x.price,0);
+      const totalBought = list.filter(x=>x.type==='buy').reduce((s,x)=>s+x.price,0);
+      const net = totalSaved - totalBought;
+
+      el.sumSaved.textContent  = fmtFt(totalSaved);
+      el.sumBought.textContent = fmtFt(totalBought);
+      el.sumNet.textContent    = `${net>=0?'+':''}${fmtFt(net)}` + (net>=0?' előnyben 🎉':' mínuszban 🙈');
+      el.sumNet.className = 'font-semibold ' + (net>=0? 'text-green-600':'text-red-600');
+
+      // Lista kirajzolása
       el.resultList.innerHTML = '';
       if(list.length === 0){
         el.resultList.innerHTML = `
@@ -504,7 +573,7 @@
         row.innerHTML = `
           <div class="flex flex-col">
             <span class="font-semibold ${color}">${escapeHtml(it.name)}</span>
-            <span class="text-sm text-slate-500">${badge}</span>
+            <span class="text-xs text-slate-500">${badge}</span>
           </div>
           <div class="flex items-center gap-3">
             <span class="tabular-nums font-semibold">${fmtFt(it.price)}</span>
@@ -524,4 +593,3 @@
   </script>
 </body>
 </html>
-
